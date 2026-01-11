@@ -1,5 +1,7 @@
 package com.civoranexus.eduvillage.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 import com.civoranexus.eduvillage.entity.User;
 import com.civoranexus.eduvillage.service.UserService;
@@ -23,4 +25,16 @@ public class UserController {
     public String test() {
         return "User API is working";
     }
+    @PostMapping("/login")
+    public String login(@RequestBody User user) {
+        return userService.login(user.getEmail(), user.getPassword());
+    }
+
+    @GetMapping("/all")
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
 }
+
+
