@@ -7,11 +7,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import jakarta.persistence.ManyToMany;
+
 
 
 @Entity
 @Table(name = "users")
 public class User {
+    @ManyToMany
+    private Set<Course> enrolledCourses = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,4 +72,13 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
+
+    public Set<Course> getEnrolledCourses() {
+        return enrolledCourses;
+    }
+
+    public void setEnrolledCourses(Set<Course> enrolledCourses) {
+        this.enrolledCourses = enrolledCourses;
+    }
+
 }

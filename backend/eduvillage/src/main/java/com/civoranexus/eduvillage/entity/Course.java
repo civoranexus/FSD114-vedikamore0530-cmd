@@ -1,9 +1,13 @@
 package com.civoranexus.eduvillage.entity;
 
 import jakarta.persistence.*;
+import java.util.Set;
+
 
 @Entity
 public class Course {
+    @ManyToMany(mappedBy = "enrolledCourses")
+    private Set<User> students;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
