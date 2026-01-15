@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.civoranexus.eduvillage.entity.Course;
@@ -37,20 +38,16 @@ public class UserService {
 
     public String login(String email, String password) {
 
-        Optional<User> optionalUser = userRepository.findByEmail(email);
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (optionalUser.isEmpty()) {
-            return "User not found";
-        }
-
-        User user = optionalUser.get();
-
-        if (passwordEncoder.matches(password, user.getPassword())) {
-            return "Login successful";
-        } else {
-            return "Invalid email or password";
-        }
+    if (!passwordEncoder.matches(password, user.getPassword())) {
+        throw new RuntimeException("Invalid password");
     }
+
+    return "Login successful";
+}
+
 
 
     
