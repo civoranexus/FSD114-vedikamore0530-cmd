@@ -3,11 +3,12 @@ package com.civoranexus.eduvillage.service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-
+import com.civoranexus.eduvillage.dto.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.civoranexus.eduvillage.config.JwtUtil;
 
 import com.civoranexus.eduvillage.entity.Course;
 import com.civoranexus.eduvillage.entity.User;
@@ -21,6 +22,9 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
+    @Autowired
+    private JwtUtil jwtUtil;
+
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
@@ -35,8 +39,8 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
-
-    public String login(String email, String password) {
+ 
+    public LoginResponse login(String email, String password) {
 
     User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -45,10 +49,10 @@ public class UserService {
         throw new RuntimeException("Invalid password");
     }
 
-    return "Login successful";
+    String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+
+    return new LoginResponse(token, user.getEmail(), user.getRole());
 }
-
-
 
     
     public List<User> getAllUsers() {

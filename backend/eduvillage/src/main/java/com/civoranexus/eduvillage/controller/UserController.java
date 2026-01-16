@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.civoranexus.eduvillage.dto.LoginResponse;
 
 import com.civoranexus.eduvillage.entity.User;
 import com.civoranexus.eduvillage.service.UserService;
@@ -37,9 +38,9 @@ public class UserController {
 
     
     @PostMapping("/login")
-    public String login(@RequestBody User user) {
+    public LoginResponse login(@RequestBody User user) {
         return userService.login(user.getEmail(), user.getPassword());
-    }
+}
 
 
     
