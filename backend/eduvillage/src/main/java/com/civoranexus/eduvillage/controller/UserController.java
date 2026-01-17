@@ -58,4 +58,10 @@ public class UserController {
         userService.enrollCourse(userId, courseId);
         return ResponseEntity.ok("User enrolled successfully");
     }
+
+    @GetMapping("/profile")
+    public String profile() {
+        return "JWT is working!";
+    }
+
 }

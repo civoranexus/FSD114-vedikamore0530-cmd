@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToMany;
 @Entity
 @Table(name = "users")
 public class User {
+    
     @ManyToMany
     private Set<Course> enrolledCourses = new HashSet<>();
     @Id
