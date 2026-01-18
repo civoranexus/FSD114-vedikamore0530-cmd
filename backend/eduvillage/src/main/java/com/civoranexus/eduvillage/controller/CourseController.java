@@ -2,6 +2,7 @@ package com.civoranexus.eduvillage.controller;
 
 import java.util.List;
 import org.springframework.web.bind.annotation.*;
+import com.civoranexus.eduvillage.dto.CourseResponse;
 import com.civoranexus.eduvillage.entity.Course;
 import com.civoranexus.eduvillage.repository.CourseRepository;
 
@@ -21,7 +22,16 @@ public class CourseController {
     }
 
     @GetMapping
-    public List<Course> getAllCourses() {
-        return courseRepository.findAll();
+    public List<CourseResponse> getAllCourses() {
+        return courseRepository.findAll()
+                .stream()
+                .map(course -> new CourseResponse(
+                        course.getId(),
+                        course.getTitle(),
+                        course.getDescription(),
+                        course.getCategory()
+                ))
+                .toList();
     }
+
 }
