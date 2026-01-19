@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import com.civoranexus.eduvillage.dto.CourseResponse;
 import com.civoranexus.eduvillage.entity.Course;
 import com.civoranexus.eduvillage.repository.CourseRepository;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @RestController
 @RequestMapping("/api/courses")
@@ -33,5 +35,20 @@ public class CourseController {
                 ))
                 .toList();
     }
+
+    @GetMapping("/{id}")
+    public CourseResponse getCourseById(@PathVariable Long id) {
+
+        Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        return new CourseResponse(
+                course.getId(),
+                course.getTitle(),
+                course.getDescription(),
+                course.getCategory()
+        );
+    }
+
 
 }
