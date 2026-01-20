@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashSet;
@@ -15,6 +17,11 @@ import jakarta.persistence.ManyToMany;
 public class User {
     
     @ManyToMany
+    @JoinTable(
+        name = "user_courses",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
     private Set<Course> enrolledCourses = new HashSet<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
