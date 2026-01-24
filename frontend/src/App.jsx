@@ -1,12 +1,5 @@
-import Login from "./pages/Login";
-
 function App() {
-  return (
-    <div>
-      <h1>EduVillage</h1>
-      <Login />
-    </div>
-  );
+  return <h1>EduVillage</h1>;
 }
 
 export default App;

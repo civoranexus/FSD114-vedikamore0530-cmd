@@ -23,7 +23,7 @@ function Login() {
 
       const data = await response.json();
       localStorage.setItem("token", data.token);
-      setMessage("Login successful");
+      window.location.href = "/dashboard";
     } catch (error) {
       setMessage("Invalid credentials");
     }
