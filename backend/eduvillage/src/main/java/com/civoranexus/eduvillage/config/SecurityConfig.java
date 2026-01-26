@@ -24,12 +24,13 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/api/users/login",
-                    "/api/users/register"
-                ).permitAll()
-                .anyRequest().authenticated()
-            )
+            .requestMatchers(
+                "/api/users/login",
+                "/api/users/register"
+            ).permitAll()
+            .anyRequest().authenticated()
+        )
+
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable());
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
