@@ -4,6 +4,12 @@ function Dashboard() {
   const [courses, setCourses] = useState([]);
   const [message, setMessage] = useState("");
 
+  const logout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  };
+
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -37,6 +43,9 @@ function Dashboard() {
   return (
     <div>
       <h2>Student Dashboard</h2>
+      
+      <button onClick={logout}>Logout</button>
+
 
       {message && <p>{message}</p>}
 
