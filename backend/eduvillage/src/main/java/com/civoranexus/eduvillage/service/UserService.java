@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.civoranexus.eduvillage.config.JwtService;
 import com.civoranexus.eduvillage.config.JwtUtil;
 
 import com.civoranexus.eduvillage.entity.Course;
@@ -24,6 +26,7 @@ public class UserService {
     private final CourseRepository courseRepository;
     @Autowired
     private JwtUtil jwtUtil;
+    private JwtService jwtService;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -49,7 +52,8 @@ public class UserService {
         throw new RuntimeException("Invalid password");
     }
 
-    String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+    String token = jwtService.generateToken(user.getEmail());
+
 
     return new LoginResponse(token, user.getEmail(), user.getRole());
 }

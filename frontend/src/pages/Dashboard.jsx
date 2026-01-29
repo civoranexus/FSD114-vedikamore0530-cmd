@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 function Dashboard() {
   const [courses, setCourses] = useState([]);
   const [message, setMessage] = useState("");
+  const [myCourses, setMyCourses] = useState([]);
+
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -23,6 +25,18 @@ function Dashboard() {
       .catch((err) => console.log(err));
   }, []);
 
+  useEffect(() => {
+    fetch("http://localhost:8090/api/users/me/courses", {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setMyCourses(data))
+      .catch((err) => console.log(err));
+  }, []);
+
+
   const enrollCourse = (courseId) => {
     fetch("http://localhost:8090/api/courses/" + courseId + "/enroll", {
       method: "POST",
@@ -36,9 +50,22 @@ function Dashboard() {
         }
         return res.text();
       })
-      .then((data) => setMessage(data))
-      .catch(() => setMessage("You are already enrolled in this course"));  
-  };
+      .then((data) => {
+        setMessage(data);
+
+        return fetch("http://localhost:8090/api/users/me/courses", {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
+      })
+      .then((res) => res.json())
+      .then((data) => setMyCourses(data))
+      .catch(() =>
+        setMessage("You are already enrolled in this course")
+      );
+    };
+
 
   return (
     <div>
@@ -60,7 +87,20 @@ function Dashboard() {
           </li>
         ))}
       </ul>
+
+      <h3>My Enrolled Courses</h3>
+
+      {myCourses.length === 0 && <p>No courses enrolled</p>}
+
+      <ul>
+        {myCourses.map((course) => (
+          <li key={course.id}>{course.title}</li>
+        ))}
+      </ul>
+
     </div>
+
+    
   );
 }
 
