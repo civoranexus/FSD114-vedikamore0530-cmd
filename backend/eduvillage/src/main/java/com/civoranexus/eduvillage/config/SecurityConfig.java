@@ -1,9 +1,8 @@
-
 package com.civoranexus.eduvillage.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,15 +13,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthFilter jwtAuthFilter;
+    private final JwtAuthFilter jwtAuthFilter;
+
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
             .csrf(csrf -> csrf.disable())
@@ -30,25 +33,26 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
+
+                // ✅ VERY IMPORTANT: allow CORS preflight
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                // public APIs
                 .requestMatchers(
                     "/api/users/login",
-                    "/api/users/register"
+                    "/api/users/register",
+                    "/api/courses",
+                    "/api/courses/**"
                 ).permitAll()
 
-                .requestMatchers(
-                    "/api/courses",
-                    "/api/courses/**",
-                    "/api/users/me/courses"
-                ).authenticated()
+                // protected APIs
+                .requestMatchers("/api/users/me/**").authenticated()
 
                 .anyRequest().authenticated()
             )
-
-        
-
-            .formLogin(form -> form.disable())
-            .httpBasic(basic -> basic.disable());
-        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .httpBasic(basic -> basic.disable())
+            .formLogin(form -> form.disable());
 
         return http.build();
     }

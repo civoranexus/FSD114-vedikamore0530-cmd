@@ -1,42 +1,80 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+
+
+/* Header */
+.header {
+  background-color: #142C52;
+  padding: 16px 24px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.header h2 {
+  font-size: 20px;
+  font-weight: 600;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Buttons */
+.btn-primary {
+  background-color: #16808D;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.btn-primary:hover {
+  background-color: #1B9AAA;
 }
 
+/* Layout container */
+.container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* Cards */
 .card {
-  padding: 2em;
+  background-color: #FFFFFF;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  margin-bottom: 20px;
+  text-align: left;
 }
 
-.read-the-docs {
-  color: #888;
+.card h3 {
+  color: #142C52;
+  margin-bottom: 10px;
+}
+
+/* Empty state */
+.empty-text {
+  color: #6B7280;
+  font-size: 14px;
+}
+
+/* Login */
+.login-card {
+  max-width: 400px;
+  margin: 100px auto;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #D1D5DB;
+}
+
+/* Error message */
+.error-text {
+  color: #EF4444;
+  font-size: 14px;
+  margin-top: 8px;
 }

@@ -2,30 +2,39 @@ import { useEffect, useState } from "react";
 
 function Dashboard() {
   const [courses, setCourses] = useState([]);
-  const [message, setMessage] = useState("");
   const [myCourses, setMyCourses] = useState([]);
+  const [message, setMessage] = useState("");
 
+  const token = localStorage.getItem("token");
 
   const logout = () => {
     localStorage.removeItem("token");
     window.location.href = "/";
   };
 
-
-  const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    fetch("http://localhost:8090/api/courses", {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
+  // 🔹 Fetch all courses
+  const fetchCourses = () => {
+  fetch("http://localhost:8090/api/courses", {
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+  })
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch courses");
+      }
+      return res.json();
     })
-      .then((res) => res.json())
-      .then((data) => setCourses(data))
-      .catch((err) => console.log(err));
-  }, []);
+    .then((data) => setCourses(data))
+    .catch((err) => {
+      console.log(err);
+      setCourses([]);
+    });
+};
 
-  useEffect(() => {
+
+  // 🔹 Fetch enrolled courses
+  const fetchMyCourses = () => {
     fetch("http://localhost:8090/api/users/me/courses", {
       headers: {
         Authorization: "Bearer " + token,
@@ -34,11 +43,16 @@ function Dashboard() {
       .then((res) => res.json())
       .then((data) => setMyCourses(data))
       .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    fetchCourses();
+    fetchMyCourses();
   }, []);
 
-
+  // 🔹 Enroll course
   const enrollCourse = (courseId) => {
-    fetch("http://localhost:8090/api/courses/" + courseId + "/enroll", {
+    fetch(`http://localhost:8090/api/courses/${courseId}/enroll`, {
       method: "POST",
       headers: {
         Authorization: "Bearer " + token,
@@ -46,61 +60,81 @@ function Dashboard() {
     })
       .then((res) => {
         if (!res.ok) {
-          throw new Error("Already enrolled or bad request");
+          throw new Error();
         }
         return res.text();
       })
-      .then((data) => {
-        setMessage(data);
-
-        return fetch("http://localhost:8090/api/users/me/courses", {
-          headers: {
-            Authorization: "Bearer " + token,
-          },
-        });
+      .then((msg) => {
+        setMessage(msg);
+        fetchMyCourses(); // refresh enrolled courses
       })
-      .then((res) => res.json())
-      .then((data) => setMyCourses(data))
       .catch(() =>
         setMessage("You are already enrolled in this course")
       );
-    };
+  };
 
+  // 🔹 Filter available courses (remove enrolled ones)
+  const enrolledIds = myCourses.map((c) => c.id);
+  const availableCourses = courses.filter(
+    (course) => !enrolledIds.includes(course.id)
+  );
 
   return (
-    <div>
-      <h2>Student Dashboard</h2>
-      
-      <button onClick={logout}>Logout</button>
+    <>
+      {/* Header */}
+      <div className="header">
+        <h2>EduVillage</h2>
+        <button className="btn-primary" onClick={logout}>
+          Logout
+        </button>
+      </div>
 
+      {/* Main Content */}
+      <div className="container">
 
-      {message && <p>{message}</p>}
+        {message && <p className="empty-text">{message}</p>}
 
-      <ul>
-        {courses.map((course) => (
-          <li key={course.id}>
-            <strong>{course.title}</strong> – {course.description}
-            <br />
-            <button onClick={() => enrollCourse(course.id)}>
-              Enroll
-            </button>
-          </li>
-        ))}
-      </ul>
+        {/* Available Courses */}
+        <div className="card">
+          <h3>Available Courses</h3>
 
-      <h3>My Enrolled Courses</h3>
+          {availableCourses.length === 0 ? (
+            <p className="empty-text">No available courses.</p>
+          ) : (
+            availableCourses.map((course) => (
+              <div key={course.id} style={{ marginBottom: "14px" }}>
+                <strong>{course.title}</strong> – {course.description}
+                <br />
+                <button
+                  className="btn-primary"
+                  style={{ marginTop: "6px" }}
+                  onClick={() => enrollCourse(course.id)}
+                >
+                  Enroll
+                </button>
+              </div>
+            ))
+          )}
+        </div>
 
-      {myCourses.length === 0 && <p>No courses enrolled</p>}
+        {/* My Enrolled Courses */}
+        <div className="card">
+          <h3>My Enrolled Courses</h3>
 
-      <ul>
-        {myCourses.map((course) => (
-          <li key={course.id}>{course.title}</li>
-        ))}
-      </ul>
-
-    </div>
-
-    
+          {myCourses.length === 0 ? (
+            <p className="empty-text">
+              You haven’t enrolled in any courses yet.
+            </p>
+          ) : (
+            myCourses.map((course) => (
+              <div key={course.id}>
+                <strong>{course.title}</strong>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 
