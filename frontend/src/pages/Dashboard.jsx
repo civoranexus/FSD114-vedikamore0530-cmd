@@ -12,26 +12,16 @@ function Dashboard() {
     window.location.href = "/";
   };
 
-  // 🔹 Fetch all courses
+  // 🔹 Fetch all courses (same as before)
   const fetchCourses = () => {
-  fetch("http://localhost:8090/api/courses", {
-    headers: {
-      Authorization: "Bearer " + token,
-    },
-  })
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error("Failed to fetch courses");
-      }
-      return res.json();
-    })
-    .then((data) => setCourses(data))
-    .catch((err) => {
-      console.log(err);
-      setCourses([]);
-    });
-};
-
+    fetch("http://localhost:8090/api/courses")
+      .then((res) => res.json())
+      .then((data) => setCourses(data))
+      .catch((err) => {
+        console.log(err);
+        setCourses([]);
+      });
+  };
 
   // 🔹 Fetch enrolled courses
   const fetchMyCourses = () => {
@@ -59,25 +49,17 @@ function Dashboard() {
       },
     })
       .then((res) => {
-        if (!res.ok) {
-          throw new Error();
-        }
+        if (!res.ok) throw new Error();
         return res.text();
       })
       .then((msg) => {
         setMessage(msg);
-        fetchMyCourses(); // refresh enrolled courses
+        fetchMyCourses(); // refresh enrolled list
       })
       .catch(() =>
         setMessage("You are already enrolled in this course")
       );
   };
-
-  // 🔹 Filter available courses (remove enrolled ones)
-  const enrolledIds = myCourses.map((c) => c.id);
-  const availableCourses = courses.filter(
-    (course) => !enrolledIds.includes(course.id)
-  );
 
   return (
     <>
@@ -94,14 +76,14 @@ function Dashboard() {
 
         {message && <p className="empty-text">{message}</p>}
 
-        {/* Available Courses */}
+        {/* Available Courses (RESTORED) */}
         <div className="card">
           <h3>Available Courses</h3>
 
-          {availableCourses.length === 0 ? (
+          {courses.length === 0 ? (
             <p className="empty-text">No available courses.</p>
           ) : (
-            availableCourses.map((course) => (
+            courses.map((course) => (
               <div key={course.id} style={{ marginBottom: "14px" }}>
                 <strong>{course.title}</strong> – {course.description}
                 <br />
