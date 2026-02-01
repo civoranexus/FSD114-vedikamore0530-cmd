@@ -12,15 +12,12 @@ function Dashboard() {
     window.location.href = "/";
   };
 
-  // 🔹 Fetch all courses (same as before)
+  // 🔹 Fetch all courses
   const fetchCourses = () => {
     fetch("http://localhost:8090/api/courses")
       .then((res) => res.json())
       .then((data) => setCourses(data))
-      .catch((err) => {
-        console.log(err);
-        setCourses([]);
-      });
+      .catch(() => setCourses([]));
   };
 
   // 🔹 Fetch enrolled courses
@@ -32,7 +29,7 @@ function Dashboard() {
     })
       .then((res) => res.json())
       .then((data) => setMyCourses(data))
-      .catch((err) => console.log(err));
+      .catch(() => setMyCourses([]));
   };
 
   useEffect(() => {
@@ -40,9 +37,9 @@ function Dashboard() {
     fetchMyCourses();
   }, []);
 
-  // 🔹 Enroll course
-  const enrollCourse = (courseId) => {
-    fetch(`http://localhost:8090/api/courses/${courseId}/enroll`, {
+  // 🔹 Enroll course (IMPORTANT FIX HERE)
+  const enrollCourse = (course) => {
+    fetch(`http://localhost:8090/api/courses/${course.id}/enroll`, {
       method: "POST",
       headers: {
         Authorization: "Bearer " + token,
@@ -52,9 +49,11 @@ function Dashboard() {
         if (!res.ok) throw new Error();
         return res.text();
       })
-      .then((msg) => {
-        setMessage(msg);
-        fetchMyCourses(); // refresh enrolled list
+      .then(() => {
+        setMessage("Enrolled successfully");
+
+        // ✅ ADD course to myCourses immediately
+        setMyCourses((prev) => [...prev, course]);
       })
       .catch(() =>
         setMessage("You are already enrolled in this course")
@@ -71,32 +70,37 @@ function Dashboard() {
         </button>
       </div>
 
-      {/* Main Content */}
       <div className="container">
-
         {message && <p className="empty-text">{message}</p>}
 
-        {/* Available Courses (RESTORED) */}
+        {/* Available Courses */}
         <div className="card">
           <h3>Available Courses</h3>
 
-          {courses.length === 0 ? (
-            <p className="empty-text">No available courses.</p>
-          ) : (
-            courses.map((course) => (
+          {courses.map((course) => {
+            const isEnrolled = myCourses.some(
+              (c) => c.id === course.id
+            );
+
+            return (
               <div key={course.id} style={{ marginBottom: "14px" }}>
                 <strong>{course.title}</strong> – {course.description}
                 <br />
                 <button
                   className="btn-primary"
-                  style={{ marginTop: "6px" }}
-                  onClick={() => enrollCourse(course.id)}
+                  style={{
+                    marginTop: "6px",
+                    backgroundColor: isEnrolled ? "#9ca3af" : "",
+                    cursor: isEnrolled ? "not-allowed" : "pointer",
+                  }}
+                  disabled={isEnrolled}
+                  onClick={() => enrollCourse(course)}
                 >
-                  Enroll
+                  {isEnrolled ? "Enrolled" : "Enroll"}
                 </button>
               </div>
-            ))
-          )}
+            );
+          })}
         </div>
 
         {/* My Enrolled Courses */}
@@ -121,3 +125,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
