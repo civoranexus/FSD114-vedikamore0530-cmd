@@ -69,5 +69,25 @@ public class CourseController {
 
         return "Enrolled successfully";
     }
+
+    @DeleteMapping("/{courseId}/unenroll")
+    public String unenrollFromCourse(
+            @PathVariable Long courseId,
+            Authentication authentication
+    ) {
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        user.getEnrolledCourses().remove(course);
+        userRepository.save(user);
+
+        return "Unenrolled successfully";
+    }
+
 }
 

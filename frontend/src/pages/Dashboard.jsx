@@ -37,7 +37,18 @@ function Dashboard() {
     fetchMyCourses();
   }, []);
 
-  // 🔹 Enroll course (IMPORTANT FIX HERE)
+  // ✅ AUTO-HIDE MESSAGE AFTER 2 SECONDS (THIS WAS MISSING)
+  useEffect(() => {
+    if (!message) return;
+
+    const timer = setTimeout(() => {
+      setMessage("");
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [message]);
+
+  // 🔹 Enroll course
   const enrollCourse = (course) => {
     fetch(`http://localhost:8090/api/courses/${course.id}/enroll`, {
       method: "POST",
@@ -51,12 +62,33 @@ function Dashboard() {
       })
       .then(() => {
         setMessage("Enrolled successfully");
-
-        // ✅ ADD course to myCourses immediately
         setMyCourses((prev) => [...prev, course]);
       })
       .catch(() =>
         setMessage("You are already enrolled in this course")
+      );
+  };
+
+  // 🔹 Unenroll course
+  const unenrollCourse = (courseId) => {
+    fetch(`http://localhost:8090/api/courses/${courseId}/unenroll`, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error();
+        return res.text();
+      })
+      .then(() => {
+        setMessage("Unenrolled successfully");
+        setMyCourses((prev) =>
+          prev.filter((course) => course.id !== courseId)
+        );
+      })
+      .catch(() =>
+        setMessage("Failed to unenroll from course")
       );
   };
 
@@ -75,7 +107,7 @@ function Dashboard() {
 
         {/* Available Courses */}
         <div className="card">
-          <h3>Available Courses</h3>
+          <h3>Available Courses ({courses.length})</h3>
 
           {courses.map((course) => {
             const isEnrolled = myCourses.some(
@@ -105,7 +137,7 @@ function Dashboard() {
 
         {/* My Enrolled Courses */}
         <div className="card">
-          <h3>My Enrolled Courses</h3>
+          <h3>My Enrolled Courses ({myCourses.length})</h3>
 
           {myCourses.length === 0 ? (
             <p className="empty-text">
@@ -113,8 +145,19 @@ function Dashboard() {
             </p>
           ) : (
             myCourses.map((course) => (
-              <div key={course.id}>
+              <div key={course.id} style={{ marginBottom: "10px" }}>
                 <strong>{course.title}</strong>
+                <br />
+                <button
+                  className="btn-primary"
+                  style={{
+                    marginTop: "4px",
+                    backgroundColor: "#ef4444",
+                  }}
+                  onClick={() => unenrollCourse(course.id)}
+                >
+                  Unenroll
+                </button>
               </div>
             ))
           )}
@@ -125,4 +168,6 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
+
 
