@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const [courses, setCourses] = useState([]);
@@ -6,6 +7,7 @@ function Dashboard() {
   const [message, setMessage] = useState("");
 
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -37,14 +39,10 @@ function Dashboard() {
     fetchMyCourses();
   }, []);
 
-  // ✅ AUTO-HIDE MESSAGE AFTER 2 SECONDS (THIS WAS MISSING)
+  // 🔹 Auto-hide message
   useEffect(() => {
     if (!message) return;
-
-    const timer = setTimeout(() => {
-      setMessage("");
-    }, 2000);
-
+    const timer = setTimeout(() => setMessage(""), 2000);
     return () => clearTimeout(timer);
   }, [message]);
 
@@ -92,6 +90,11 @@ function Dashboard() {
       );
   };
 
+  // ✅ THIS IS THE KEY FIX
+  const availableCourses = courses.filter(
+    (course) => !myCourses.some((c) => c.id === course.id)
+  );
+
   return (
     <>
       {/* Header */}
@@ -107,32 +110,34 @@ function Dashboard() {
 
         {/* Available Courses */}
         <div className="card">
-          <h3>Available Courses ({courses.length})</h3>
+          <h3>Available Courses ({availableCourses.length})</h3>
 
-          {courses.map((course) => {
-            const isEnrolled = myCourses.some(
-              (c) => c.id === course.id
-            );
-
-            return (
+          {availableCourses.length === 0 ? (
+            <p className="empty-text">No available courses.</p>
+          ) : (
+            availableCourses.map((course) => (
               <div key={course.id} style={{ marginBottom: "14px" }}>
-                <strong>{course.title}</strong> – {course.description}
+                <strong
+                  style={{ cursor: "pointer", color: "#2563eb" }}
+                  onClick={() =>
+                    navigate("/course", { state: { course } })
+                  }
+                >
+                  {course.title}
+                </strong>{" "}
+                – {course.description}
                 <br />
+
                 <button
                   className="btn-primary"
-                  style={{
-                    marginTop: "6px",
-                    backgroundColor: isEnrolled ? "#9ca3af" : "",
-                    cursor: isEnrolled ? "not-allowed" : "pointer",
-                  }}
-                  disabled={isEnrolled}
+                  style={{ marginTop: "6px" }}
                   onClick={() => enrollCourse(course)}
                 >
-                  {isEnrolled ? "Enrolled" : "Enroll"}
+                  Enroll
                 </button>
               </div>
-            );
-          })}
+            ))
+          )}
         </div>
 
         {/* My Enrolled Courses */}
@@ -168,6 +173,7 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
 
 
 

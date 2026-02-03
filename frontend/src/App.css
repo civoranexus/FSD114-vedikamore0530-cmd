@@ -1,3 +1,13 @@
+/* ===== GLOBAL RESET (MISSING PART) ===== */
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: #F3F4F6; /* light grey like before */
+}
 
 
 /* Header */

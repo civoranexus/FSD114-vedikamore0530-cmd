@@ -1,8 +1,18 @@
-import "./App.css";
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import CourseDetails from "./pages/CourseDetails";
 
 function App() {
-  return <h1>EduVillage</h1>;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/course" element={<CourseDetails />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
