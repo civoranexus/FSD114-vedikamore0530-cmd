@@ -90,7 +90,7 @@ function Dashboard() {
       );
   };
 
-  // ✅ THIS IS THE KEY FIX
+  
   const availableCourses = courses.filter(
     (course) => !myCourses.some((c) => c.id === course.id)
   );
