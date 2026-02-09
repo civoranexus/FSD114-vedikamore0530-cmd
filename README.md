@@ -62,4 +62,30 @@ http://localhost:5173
 ## Author
 Vedika More
 
+---
+
+## Final Submission Notes
+
+### Completed Modules
+
+* Authentication with JWT
+* Course listing API
+* Enroll / Unenroll functionality
+* User-specific dashboard
+* Course details navigation
+* UI theme implementation
+
+### API Endpoints Used
+
+* POST /api/users/register
+* POST /api/users/login
+* GET /api/courses
+* POST /api/courses/{id}/enroll
+* DELETE /api/courses/{id}/unenroll
+* GET /api/users/me/courses
+
+### Status
+
+Project completed and ready for submission.
+
 
